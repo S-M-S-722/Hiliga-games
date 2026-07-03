@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HLIGA · Players</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0c; font-family: 'Inter', sans-serif; color: #eef2ff; }
+        .players-page-container { background: rgba(19,20,31,0.95); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid #ff2a6d; max-width: 1400px; margin: 0 auto; }
+        .players-list { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; max-height: 65vh; overflow-y: auto; }
+        .player-row { background: #0f111c; border-radius: 20px; padding: 12px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid #ff2a6d40; transition: 0.1s; flex-wrap: wrap; cursor: pointer; position: relative; }
+        .player-row:hover { border-color: #05ffa1; background: #1a1c2e; }
+        .player-small-img { width: 70px; height: 70px; object-fit: contain; border-radius: 16px; background: #1a1c2e; padding: 6px; cursor: pointer; transition: 0.2s; }
+        .player-small-img:hover { transform: scale(1.08); border: 1px solid #05ffa1; }
+        .player-info-area { flex: 1; }
+        .player-name-text { font-size: 1.1rem; color: #05ffa1; margin-bottom: 6px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .level-small { font-size: 0.7rem; color: #a8b3cf; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .level-badge { background: #ff2a6d20; padding: 2px 10px; border-radius: 30px; }
+        .collection-ovr-badge { position: absolute; top: 8px; left: 16px; font-size: 0.65rem; color: white; z-index: 10; background: transparent; border: none; box-shadow: none; text-shadow: 0 0 8px rgba(0,0,0,0.9); line-height: 1.1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; animation: ovrFlash 3s infinite ease-in-out; }
+        @keyframes ovrFlash { 0%,100% { color: white; } 50% { color: #ffd700; } }
+        .back-home-btn { background: rgba(5,255,161,0.2); border: 1px solid #05ffa1; border-radius: 40px; padding: 8px 20px; font-weight: bold; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #eef2ff; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .back-home-btn:hover { background: #05ffa1; color: #0a0a0c; }
+        h3 { font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; color: #05ffa1; }
+        .toast-msg { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #ff2a6d; color: white; padding: 8px 22px; border-radius: 60px; z-index: 2100; opacity: 0; transition: 0.2s; pointer-events: none; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        /* Player Detail Modal */
+        .player-detail-full { position: fixed; inset: 0; background: #0a0a0c; z-index: 9000; display: none; flex-direction: column; padding: 20px 24px; overflow-y: auto; }
+        .player-detail-full.active { display: flex; }
+        .detail-header { display: flex; align-items: center; gap: 16px; padding: 8px 0 18px; border-bottom: 1px solid #ff2a6d40; margin-bottom: 24px; flex-wrap: wrap; }
+        .detail-header .back-btn { background: #ff2a6d; border: none; color: white; padding: 8px 20px; border-radius: 40px; cursor: pointer; font-size: 0.9rem; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .detail-header .back-btn i { margin-right: 8px; }
+        .detail-header h2 { color: #05ffa1; font-size: 1.3rem; margin-left: 4px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .detail-tabs { display: flex; gap: 12px; margin-left: auto; }
+        .detail-tab { background: rgba(255,42,109,0.15); border: 1px solid #ff2a6d60; color: #eef2ff; padding: 8px 20px; border-radius: 40px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .detail-tab:hover { background: #ff2a6d30; border-color: #05ffa1; }
+        .detail-tab.active { background: #ff2a6d; border-color: #ff2a6d; color: white; }
+        .detail-body { display: flex; flex-direction: row; gap: 32px; flex: 1; flex-wrap: wrap; }
+        .detail-left-col { display: flex; flex-direction: column; align-items: center; min-width: 200px; flex: 0 0 auto; position: relative; }
+        .detail-left-col .player-card-img { width: 200px; height: 200px; object-fit: contain; border-radius: 0px; background: transparent; border: none; box-shadow: none; }
+        .ovr-badge { position: absolute; top: 15px; left: 45px; font-size: 1.4rem; color: white; z-index: 10; line-height: 1.4; background: transparent; border: none; box-shadow: none; text-shadow: 0 0 10px rgba(0,0,0,0.7); font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; }
+        .detail-left-col .player-name-big { font-size: 1.8rem; color: #05ffa1; margin-top: 14px; text-align: center; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 1px; }
+        .detail-left-col .player-team { color: #a8b3cf; font-size: 0.9rem; margin-top: 4px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .detail-right-stats { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; padding: 8px 0; min-width: 260px; }
+        .stat-item { display: flex; flex-direction: column; border-bottom: 1px solid #ff2a6d20; padding-bottom: 10px; }
+        .stat-item .stat-label { font-size: 0.7rem; color: #7a85a0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; }
+        .stat-item .stat-value { font-size: 1.2rem; color: #eef2ff; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .progression-tab { display: none; flex-direction: column; width: 100%; margin-top: 8px; background: #0f111c; border-radius: 20px; padding: 20px 24px; border: 1px solid #ff2a6d40; }
+        .progression-tab.active { display: flex; }
+        .prog-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #ff2a6d30; margin-bottom: 16px; }
+        .prog-header .prog-name { font-size: 1.6rem; color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .prog-header .prog-rating { font-size: 1.8rem; color: #eef2ff; background: #ff2a6d20; padding: 4px 16px; border-radius: 40px; border: 1px solid #ff2a6d60; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .prog-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+        .prog-stat { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #1a1c2e; }
+        .prog-stat .prog-label { color: #a8b3cf; font-size: 0.85rem; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .prog-stat .prog-controls { display: flex; align-items: center; gap: 10px; }
+        .prog-stat .prog-value { color: #eef2ff; font-size: 1.1rem; min-width: 30px; text-align: center; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .prog-stat .prog-value.highlight { color: #05ffa1; }
+        .prog-stat .arrow-btn { background: rgba(255,42,109,0.15); border: 1px solid #ff2a6d60; color: #eef2ff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 0.8rem; }
+        .prog-stat .arrow-btn:hover { background: #ff2a6d30; border-color: #05ffa1; transform: scale(1.1); }
+        .prog-stat .arrow-btn:active { transform: scale(0.9); }
+        .prog-stat .arrow-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .training-tab { display: none; flex-direction: column; width: 100%; margin-top: 8px; background: #0f111c; border-radius: 20px; padding: 20px 24px; border: 1px solid #ff2a6d40; }
+        .training-tab.active { display: flex; }
+        .training-table { width: 100%; }
+        .training-table .table-row { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 16px 20px; border-bottom: 1px solid #1a1c2e; align-items: center; }
+        .training-table .table-row:last-child { border-bottom: none; }
+        .training-table .table-header { background: #1a1c2e; color: #7a85a0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; }
+        .training-table .table-row .col { color: #eef2ff; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .training-table .table-row .col.highlight { color: #05ffa1; }
+        .training-table .table-row .col .used-badge { background: #ff2a6d20; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; color: #ff2a6d; }
+        .train-btn { background: linear-gradient(95deg, #ff2a6d, #b0104a); border: none; padding: 6px 20px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.8rem; transition: 0.2s; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .train-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px #ff2a6d55; }
+        .train-btn:active { transform: scale(0.95); }
+        .train-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    </style>
+</head>
+<body>
+    <div id="dynamicMainArea">
+        <div class="players-page-container">
+            <div class="back-home-btn" id="backHomeBtn"><i class="fas fa-home"></i> Back to Home</div>
+            <h3><i class="fas fa-users"></i> MY COLLECTION</h3>
+            <div class="players-list" id="playersList">
+                <!-- Players will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Player Detail Modal -->
+    <div id="playerDetailFull" class="player-detail-full">
+        <div class="detail-header">
+            <button class="back-btn" id="backFromDetail"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2><i class="fas fa-user"></i> Player</h2>
+            <div class="detail-tabs">
+                <button class="detail-tab active" data-tab="details">Player Details</button>
+                <button class="detail-tab" data-tab="training">Level Training</button>
+            </div>
+        </div>
+        <div class="detail-body">
+            <div class="detail-left-col">
+                <img id="detailFullImg" class="player-card-img" src="" alt="player card">
+                <div class="ovr-badge" id="cardOvrBadge">45</div>
+                <div class="player-name-big" id="detailFullName">Player Name</div>
+                <div class="player-team" id="detailFullTeam">Nationality</div>
+            </div>
+            <div class="detail-right-stats" id="detailStatsContainer">
+                <div class="stat-item">
+                    <span class="stat-label">Height / Age</span>
+                    <span class="stat-value" id="detailHeightAge">185 / 29</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Stronger Foot</span>
+                    <span class="stat-value" id="detailFoot">Right Foot</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Level</span>
+                    <span class="stat-value" id="detailLevel">1 / 32</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Next Level in</span>
+                    <span class="stat-value" id="detailNextLevel">204</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Progression Points</span>
+                    <span class="stat-value" id="detailProgression">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Nationality / Region</span>
+                    <span class="stat-value" id="detailNationality">Portugal</span>
+                </div>
+            </div>
+
+            <div id="progressionTab" class="progression-tab active">
+                <div class="prog-header">
+                    <span class="prog-name" id="progPlayerName">PLAYER NAME</span>
+                    <span class="prog-rating" id="progOverallRating">48</span>
+                </div>
+                <div class="prog-stats-grid" id="progStatsGrid"></div>
+                <div style="margin-top: 12px; color: #7a85a0; font-size: 0.75rem; text-align: center; border-top: 1px solid #ff2a6d20; padding-top: 12px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px;">
+                    <i class="fas fa-info-circle"></i> Decrease any stat to increase another (40-99)
+                </div>
+            </div>
+
+            <div id="trainingTab" class="training-tab">
+                <div class="training-table">
+                    <div class="table-row table-header">
+                        <span class="col">Training Program</span>
+                        <span class="col">Number Used</span>
+                        <span class="col">Action</span>
+                    </div>
+                    <div class="table-row" data-program="50">
+                        <span class="col highlight">50 coin (5 level with each)</span>
+                        <span class="col"><span class="used-badge" id="used_50">0</span></span>
+                        <span class="col"><button class="train-btn" data-program="50" data-levels="5">Train</button></span>
+                    </div>
+                    <div class="table-row" data-program="100">
+                        <span class="col highlight">100 coin (10 level with each)</span>
+                        <span class="col"><span class="used-badge" id="used_100">0</span></span>
+                        <span class="col"><button class="train-btn" data-program="100" data-levels="10">Train</button></span>
+                    </div>
+                    <div class="table-row" data-program="150">
+                        <span class="col highlight">150 coin (15 level with each)</span>
+                        <span class="col"><span class="used-badge" id="used_150">0</span></span>
+                        <span class="col"><button class="train-btn" data-program="150" data-levels="15">Train</button></span>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; color: #7a85a0; font-size: 0.8rem; text-align: center; border-top: 1px solid #ff2a6d20; padding-top: 16px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px;">
+                    <i class="fas fa-info-circle"></i> Train your player to increase stats and level up
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastMsg" class="toast-msg"></div>
+    <script>
+        // Player stats configuration
+        const playerStatsConfig = {
+            "Bernando Silva": { attackingAwareness: 80, ballControl: 84, dribbling: 82, tightPossession: 83 },
+            "Vitinha": { attackingAwareness: 76, ballControl: 80, dribbling: 78, tightPossession: 79 },
+            "Nuno Mendes": { attackingAwareness: 75, ballControl: 78, dribbling: 77, tightPossession: 79 },
+            "Bruno Fernandes": { attackingAwareness: 82, ballControl: 81, dribbling: 78, tightPossession: 80 },
+            "Joao Neves": { attackingAwareness: 74, ballControl: 77, dribbling: 76, tightPossession: 77 },
+            "Rafael Leao": { attackingAwareness: 76, ballControl: 74, dribbling: 73, tightPossession: 72 },
+            "Ruben Dias": { attackingAwareness: 71, ballControl: 73, dribbling: 72, tightPossession: 76 },
+            "Goncalo Inacio": { attackingAwareness: 79, ballControl: 82, dribbling: 80, tightPossession: 83 },
+            "Joao Cancelo": { attackingAwareness: 76, ballControl: 78, dribbling: 77, tightPossession: 79 },
+            "Diago Costa": { attackingAwareness: 75, ballControl: 79, dribbling: 77, tightPossession: 80 },
+            "Shanaj": { attackingAwareness: 94, ballControl: 93, dribbling: 92, tightPossession: 91 },
+            "Haseeb": { attackingAwareness: 84, ballControl: 83, dribbling: 82, tightPossession: 83 }
+        };
+        const playerImages = {
+            "Shanaj": "https://ik.imagekit.io/shaz/Untitled%20design%20(2)-Photoroom.png",
+            "Haseeb": "https://ik.imagekit.io/shaz/Untitled%20design%20(1)-Photoroom.png",
+            "Bernando Silva": "https://ik.imagekit.io/shaz/BERNANDO%20SILVA_card-Photoroom.png",
+            "Vitinha": "https://ik.imagekit.io/shaz/VITINHA_card-Photoroom.png",
+            "Nuno Mendes": "https://ik.imagekit.io/shaz/NUNO%20MENDES%20_card-Photoroom.png",
+            "Bruno Fernandes": "https://ik.imagekit.io/shaz/BRUNO%20FERNANDES_card-Photoroom.png",
+            "Joao Neves": "https://ik.imagekit.io/shaz/JOAO%20NEVES_card%20(1)-Photoroom.png",
+            "Rafael Leao": "https://ik.imagekit.io/shaz/RAFEAL%20LEAO_card-Photoroom.png",
+            "Ruben Dias": "https://ik.imagekit.io/shaz/RUBEN%20DIAS_card-Photoroom.png",
+            "Goncalo Inacio": "https://ik.imagekit.io/shaz/GON%C3%87ALO%20IN%C3%81CIO_card-Photoroom.png",
+            "Joao Cancelo": "https://ik.imagekit.io/shaz/JOAO%20CANCELO_card-Photoroom.png",
+            "Diago Costa": "https://ik.imagekit.io/shaz/DIAGO%20COSTA_card.png?updatedAt=1780881032251"
+        };
+
+        let myPlayers = [];
+        let currentDetailPlayer = null;
+        let currentPlayerStats = { attackingAwareness: 42, ballControl: 44, dribbling: 46, tightPossession: 48 };
+        let availablePoints = 0;
+        let currentCoins = 0;
+
+        function showToast(msg) {
+            let t = document.getElementById("toastMsg");
+            t.textContent = msg;
+            t.style.opacity = "1";
+            setTimeout(() => t.style.opacity = "0", 2000);
+        }
+
+        function getOvrBonus(level) {
+            if (level >= 32) return 4;
+            if (level >= 24) return 3;
+            if (level >= 16) return 2;
+            if (level >= 8) return 1;
+            return 0;
+        }
+
+        function getPlayerOverall(player) {
+            if (!player) return 0;
+            if (!player.stats) {
+                const config = playerStatsConfig[player.name];
+                if (config) player.stats = { ...config };
+                else player.stats = { attackingAwareness: 40 + Math.floor(Math.random() * 10), ballControl: 40 + Math.floor(Math.random() * 10), dribbling: 40 + Math.floor(Math.random() * 10), tightPossession: 40 + Math.floor(Math.random() * 10) };
+            }
+            const base = playerStatsConfig[player.name];
+            if (!base) {
+                return Math.round((player.stats.attackingAwareness + player.stats.ballControl + player.stats.dribbling + player.stats.tightPossession) / 4);
+            }
+            const baseOvr = Math.round((base.attackingAwareness + base.ballControl + base.dribbling + base.tightPossession) / 4);
+            const bonus = getOvrBonus(player.level || 1);
+            const inc = (player.stats.attackingAwareness - base.attackingAwareness) + 
+                        (player.stats.ballControl - base.ballControl) + 
+                        (player.stats.dribbling - base.dribbling) + 
+                        (player.stats.tightPossession - base.tightPossession);
+            return Math.round(baseOvr + (inc / 4) + bonus);
+        }
+
+        function getNationality(playerName) {
+            const name = playerName.toLowerCase();
+            if (name === "shanaj" || name === "haseeb") return "India";
+            if (name === "diago costa") return "Brazil";
+            return "Portugal";
+        }
+
+        function loadPlayers() {
+            try {
+                if (window.parent && window.parent.myPlayers) {
+                    myPlayers = window.parent.myPlayers;
+                } else {
+                    const stored = localStorage.getItem("hliga_players");
+                    if (stored) myPlayers = JSON.parse(stored);
+                }
+                // Ensure all players have proper stats
+                myPlayers.forEach(p => {
+                    if (!p.stats) {
+                        const config = playerStatsConfig[p.name];
+                        if (config) p.stats = { ...config };
+                        else p.stats = { attackingAwareness: 40 + Math.floor(Math.random() * 10), ballControl: 40 + Math.floor(Math.random() * 10), dribbling: 40 + Math.floor(Math.random() * 10), tightPossession: 40 + Math.floor(Math.random() * 10) };
+                    }
+                    if (!p.level) p.level = 1;
+                    if (!p.trainingUsed) p.trainingUsed = { 50: 0, 100: 0, 150: 0 };
+                });
+                // Get coins
+                try {
+                    if (window.parent && window.parent.currentCoins !== undefined) {
+                        currentCoins = window.parent.currentCoins;
+                    } else {
+                        currentCoins = parseInt(localStorage.getItem("hliga_coins")) || 0;
+                    }
+                } catch (e) { currentCoins = 0; }
+            } catch (e) { myPlayers = []; }
+            renderPlayers();
+        }
+
+        function syncPlayers() {
+            try {
+                if (window.parent && window.parent.myPlayers) {
+                    window.parent.myPlayers = myPlayers;
+                }
+                localStorage.setItem("hliga_players", JSON.stringify(myPlayers));
+            } catch (e) {}
+        }
+
+        function renderPlayers() {
+            const list = document.getElementById("playersList");
+            if (!list) return;
+            if (myPlayers.length === 0) {
+                list.innerHTML = '<div style="padding:20px;text-align:center;font-family:Black Ops One,Inter,sans-serif;font-weight:400;letter-spacing:0.5px;">No players yet. SPIN THE PACK!</div>';
+                return;
+            }
+            list.innerHTML = myPlayers.map(p => {
+                const overall = getPlayerOverall(p);
+                return `
+                    <div class="player-row" data-player='${JSON.stringify(p).replace(/'/g,"&#39;")}'>
+                        <div style="position:relative;display:inline-block;">
+                            <img class="player-small-img" src="${p.image}" onerror="this.src='https://via.placeholder.com/70'">
+                            <span class="collection-ovr-badge">${overall}</span>
+                        </div>
+                        <div class="player-info-area">
+                            <div class="player-name-text">${p.name.toUpperCase()}</div>
+                            <div class="level-small">
+                                <span class="level-badge">LEVEL ${p.level||1}/32</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelectorAll(".player-row").forEach(row => {
+                row.addEventListener("click", function() {
+                    const data = this.getAttribute("data-player");
+                    if (data) {
+                        try {
+                            const player = JSON.parse(data);
+                            showPlayerDetail(player);
+                        } catch (e) {}
+                    }
+                });
+            });
+        }
+
+        // ----- PLAYER DETAIL MODAL -----
+        function showPlayerDetail(player) {
+            currentDetailPlayer = player;
+            const page = document.getElementById("playerDetailFull");
+            document.getElementById("detailFullImg").src = player.image;
+            document.getElementById("detailFullName").innerText = player.name.toUpperCase();
+            
+            const nationality = getNationality(player.name);
+            document.getElementById("detailNationality").innerHTML = nationality;
+            document.getElementById("detailFullTeam").innerHTML = nationality;
+
+            document.getElementById("detailHeightAge").innerHTML = `185 / 29`;
+            document.getElementById("detailFoot").innerHTML = `Right Foot`;
+            document.getElementById("detailLevel").innerHTML = `${player.level || 1} / 32`;
+            document.getElementById("detailNextLevel").innerHTML = `204`;
+            document.getElementById("detailProgression").innerHTML = `0`;
+
+            document.getElementById("progPlayerName").innerHTML = player.name.toUpperCase();
+
+            if (player.stats) {
+                currentPlayerStats = { ...player.stats };
+            } else {
+                const config = playerStatsConfig[player.name];
+                if (config) { currentPlayerStats = { ...config };
+                    player.stats = { ...config }; } else {
+                    currentPlayerStats = { attackingAwareness: 40 + Math.floor(Math.random() * 10), ballControl: 40 + Math.floor(Math.random() * 10), dribbling: 40 + Math.floor(Math.random() * 10), tightPossession: 40 + Math.floor(Math.random() * 10) };
+                    player.stats = { ...currentPlayerStats };
+                }
+                syncPlayers();
+            }
+            availablePoints = 0;
+
+            if (!player.trainingUsed) {
+                player.trainingUsed = { 50: 0, 100: 0, 150: 0 };
+            }
+            document.getElementById("used_50").innerHTML = player.trainingUsed[50] || 0;
+            document.getElementById("used_100").innerHTML = player.trainingUsed[100] || 0;
+            document.getElementById("used_150").innerHTML = player.trainingUsed[150] || 0;
+
+            document.querySelectorAll('.train-btn').forEach(btn => {
+                const program = parseInt(btn.getAttribute('data-program'));
+                const used = player.trainingUsed[program] || 0;
+                if (used >= 10 || player.level >= 32) {
+                    btn.disabled = true;
+                    btn.innerHTML = used >= 10 ? 'Max Used' : 'Max Level';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Train';
+                }
+            });
+
+            document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-tab="details"]').classList.add('active');
+            document.getElementById('progressionTab').classList.add('active');
+            document.getElementById('trainingTab').classList.remove('active');
+
+            renderProgressionStats();
+            page.classList.add("active");
+        }
+
+        function renderProgressionStats() {
+            const grid = document.getElementById("progStatsGrid");
+            const stats = currentPlayerStats;
+            const statConfigs = [
+                { key: 'attack', label: 'Attack', value: '—', isStatic: true },
+                { key: 'attackingAwareness', label: 'Attacking Awareness', value: stats.attackingAwareness },
+                { key: 'ballControl', label: 'Ball Control', value: stats.ballControl },
+                { key: 'dribbling', label: 'Dribbling', value: stats.dribbling },
+                { key: 'tightPossession', label: 'Tight Possession', value: stats.tightPossession }
+            ];
+
+            grid.innerHTML = statConfigs.map(cfg => {
+                if (cfg.isStatic) {
+                    return `
+                        <div class="prog-stat">
+                            <span class="prog-label">${cfg.label}</span>
+                            <span class="prog-value">—</span>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="prog-stat">
+                        <span class="prog-label">${cfg.label}</span>
+                        <div class="prog-controls">
+                            <button class="arrow-btn left-arrow" data-stat="${cfg.key}" data-dir="-1"><i class="fas fa-chevron-left"></i></button>
+                            <span class="prog-value highlight" id="progVal_${cfg.key}">${cfg.value}</span>
+                            <button class="arrow-btn right-arrow disabled" data-stat="${cfg.key}" data-dir="1"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.arrow-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const statKey = this.getAttribute('data-stat');
+                    const dir = parseInt(this.getAttribute('data-dir'));
+                    const currentVal = currentPlayerStats[statKey];
+
+                    if (dir === -1) {
+                        if (currentVal > 40) {
+                            currentPlayerStats[statKey] = currentVal - 1;
+                            availablePoints += 1;
+                            document.getElementById(`progVal_${statKey}`).innerHTML = currentPlayerStats[statKey];
+                            updateOverallRating();
+                            updateArrowStates();
+                            showToast(`Decreased ${statKey}. Available points: ${availablePoints}`);
+                        } else {
+                            showToast(`Cannot go below 40`);
+                        }
+                    } else if (dir === 1) {
+                        if (availablePoints > 0 && currentVal < 99) {
+                            currentPlayerStats[statKey] = currentVal + 1;
+                            availablePoints -= 1;
+                            document.getElementById(`progVal_${statKey}`).innerHTML = currentPlayerStats[statKey];
+                            updateOverallRating();
+                            updateArrowStates();
+                            showToast(`Increased ${statKey}. Available points: ${availablePoints}`);
+                        } else if (availablePoints <= 0) {
+                            showToast(`No available points! Decrease a stat first.`);
+                        } else {
+                            showToast(`Cannot go above 99`);
+                        }
+                    }
+                });
+            });
+
+            availablePoints = 0;
+            updateOverallRating();
+            updateArrowStates();
+        }
+
+        function updateOverallRating() {
+            const stats = currentPlayerStats;
+            const overall = Math.round((stats.attackingAwareness + stats.ballControl + stats.dribbling + stats.tightPossession) / 4);
+            document.getElementById("progOverallRating").innerHTML = overall;
+            document.getElementById("cardOvrBadge").innerHTML = overall;
+            return overall;
+        }
+
+        function updateArrowStates() {
+            document.querySelectorAll('.left-arrow').forEach(btn => {
+                const statKey = btn.getAttribute('data-stat');
+                const currentVal = currentPlayerStats[statKey];
+                btn.classList.toggle('disabled', currentVal <= 40);
+            });
+
+            document.querySelectorAll('.right-arrow').forEach(btn => {
+                const statKey = btn.getAttribute('data-stat');
+                const currentVal = currentPlayerStats[statKey];
+                btn.classList.toggle('disabled', !(availablePoints > 0 && currentVal < 99));
+            });
+        }
+
+        // ----- TRAINING HANDLER -----
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.train-btn');
+            if (!btn) return;
+            if (btn.disabled) return;
+            
+            const program = parseInt(btn.getAttribute('data-program'));
+            const levelsPerTraining = parseInt(btn.getAttribute('data-levels'));
+            const player = currentDetailPlayer;
+            if (!player) return;
+            
+            // Get current coins
+            try {
+                if (window.parent && window.parent.currentCoins !== undefined) {
+                    currentCoins = window.parent.currentCoins;
+                } else {
+                    currentCoins = parseInt(localStorage.getItem("hliga_coins")) || 0;
+                }
+            } catch (e) { currentCoins = 0; }
+            
+            if (currentCoins < program) {
+                showToast(`Need ${program} coins! You have ${currentCoins}`);
+                return;
+            }
+            
+            currentCoins -= program;
+            // Update coins in parent/localStorage
+            try {
+                if (window.parent && window.parent.currentCoins !== undefined) {
+                    window.parent.currentCoins = currentCoins;
+                }
+                localStorage.setItem("hliga_coins", currentCoins);
+            } catch (e) {}
+            
+            if (!player.trainingUsed) player.trainingUsed = { 50: 0, 100: 0, 150: 0 };
+            player.trainingUsed[program] = (player.trainingUsed[program] || 0) + 1;
+            const newLevel = Math.min(player.level + levelsPerTraining, 32);
+            player.level = newLevel;
+            
+            // Increase stats by 1 for each training
+            if (player.stats) {
+                player.stats.attackingAwareness = Math.min(99, (player.stats.attackingAwareness || 40) + 1);
+                player.stats.ballControl = Math.min(99, (player.stats.ballControl || 40) + 1);
+                player.stats.dribbling = Math.min(99, (player.stats.dribbling || 40) + 1);
+                player.stats.tightPossession = Math.min(99, (player.stats.tightPossession || 40) + 1);
+                currentPlayerStats = { ...player.stats };
+            }
+            
+            syncPlayers();
+            
+            // Update UI
+            document.getElementById("used_50").innerHTML = player.trainingUsed[50] || 0;
+            document.getElementById("used_100").innerHTML = player.trainingUsed[100] || 0;
+            document.getElementById("used_150").innerHTML = player.trainingUsed[150] || 0;
+            document.querySelectorAll('.train-btn').forEach(b => {
+                const prog = parseInt(b.getAttribute('data-program'));
+                const used = player.trainingUsed[prog] || 0;
+                if (used >= 10 || player.level >= 32) {
+                    b.disabled = true;
+                    b.innerHTML = used >= 10 ? 'Max Used' : 'Max Level';
+                } else {
+                    b.disabled = false;
+                    b.innerHTML = 'Train';
+                }
+            });
+            document.getElementById("detailLevel").innerHTML = `${player.level} / 32`;
+            
+            // Update progression stats
+            renderProgressionStats();
+            
+            // Update OVR badge
+            const overall = getPlayerOverall(player);
+            document.getElementById("cardOvrBadge").innerHTML = overall;
+            document.getElementById("progOverallRating").innerHTML = overall;
+            
+            // Update the player in the list
+            renderPlayers();
+            
+            // Sync with parent
+            if (window.parent && window.parent.updateUI) {
+                window.parent.updateUI();
+            }
+            
+            const bonus = getOvrBonus(player.level);
+            let bonusText = bonus > 0 ? ` (+${bonus} OVR from level bonus)` : '';
+            showToast(`Trained with ${program} coins! +${levelsPerTraining} levels. Level ${newLevel}${bonusText}`);
+        });
+
+        // ----- TAB SWITCHING -----
+        document.querySelectorAll('.detail-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.getAttribute('data-tab');
+                if (tabName === 'details') {
+                    document.getElementById('progressionTab').classList.add('active');
+                    document.getElementById('trainingTab').classList.remove('active');
+                } else {
+                    document.getElementById('progressionTab').classList.remove('active');
+                    document.getElementById('trainingTab').classList.add('active');
+                }
+            });
+        });
+
+        document.getElementById("backFromDetail").addEventListener("click", function() {
+            document.getElementById("playerDetailFull").classList.remove("active");
+            syncPlayers();
+            renderPlayers();
+            if (window.parent && window.parent.updateUI) {
+                window.parent.updateUI();
+            }
+        });
+
+        document.getElementById("backHomeBtn")?.addEventListener("click", function() {
+            syncPlayers();
+            if (window.parent && window.parent.showHome) {
+                window.parent.showHome();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        loadPlayers();
+        
+        // Periodically sync and update OVR badges
+        setInterval(() => {
+            let changed = false;
+            myPlayers.forEach(p => {
+                const current = getPlayerOverall(p);
+                if (p._lastOvr !== current) {
+                    p._lastOvr = current;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                renderPlayers();
+                syncPlayers();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
