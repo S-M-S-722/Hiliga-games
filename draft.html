@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HLIGA · Draft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0c; font-family: 'Inter', sans-serif; color: #eef2ff; }
+        .draft-page-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .pack-card { width: 500px; background: linear-gradient(145deg, #13141f, #0c0d14); border-radius: 2rem; border: 1px solid #ff2a6d; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(255,42,109,0.15); }
+        .pack-header { position: relative; background: #0b0c12; padding: 0.8rem 1rem; border-bottom: 1px solid #05ffa1; text-align: center; flex-shrink: 0; }
+        .pack-header strong { font-size: 1.3rem; letter-spacing: 1px; color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; }
+        .more-details-btn { position: absolute; top: 12px; right: 16px; background: rgba(255,42,109,0.2); border: 1px solid #05ffa1; padding: 5px 14px; border-radius: 40px; font-size: 0.7rem; color: #05ffa1; cursor: pointer; z-index: 5; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; transition: 0.2s; }
+        .more-details-btn:hover { background: #ff2a6d; color: white; }
+        .pack-image-area { flex: 1; text-align: center; padding: 0; background: #0a0a0c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .pack-full-image { width: 500px; height: 300px; object-fit: cover; display: block; }
+        .pack-stats { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: #0c0d14d9; border-top: 1px solid #ff2a6d; flex-shrink: 0; flex-wrap: wrap; gap: 12px; }
+        .remaining-box { background: #ff2a6d20; padding: 8px 20px; border-radius: 60px; border-left: 3px solid #ff2a6d; font-size: 1.2rem; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .spin-button { background: linear-gradient(95deg, #ff2a6d, #b0104a); border: none; padding: 10px 28px; border-radius: 60px; font-size: 1.2rem; color: white; cursor: pointer; box-shadow: 0 0 12px #ff2a6d; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; transition: 0.2s; }
+        .spin-button:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(255,42,109,0.5); }
+        .spin-button:active { transform: scale(0.96); }
+        .back-home-btn { background: rgba(5,255,161,0.2); border: 1px solid #05ffa1; border-radius: 40px; padding: 8px 20px; font-weight: bold; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #eef2ff; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; align-self: flex-start; }
+        .back-home-btn:hover { background: #05ffa1; color: #0a0a0c; }
+        .toast-msg { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #ff2a6d; color: white; padding: 8px 22px; border-radius: 60px; z-index: 2100; opacity: 0; transition: 0.2s; pointer-events: none; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        
+        /* VIDEO OVERLAY */
+        .video-result-overlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; flex-direction: column; }
+        .video-result-overlay.active { visibility: visible; opacity: 1; }
+        .video-wrapper { width: 100%; height: 100%; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
+        .video-wrapper video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .cancel-video-btn { position: absolute; top: 30px; right: 30px; background: #1a5fb4; border: 2px solid #05ffa1; color: white; font-weight: 700; padding: 12px 28px; border-radius: 60px; font-size: 1.1rem; cursor: pointer; z-index: 50; box-shadow: 0 0 20px rgba(5,255,161,0.4); transition: 0.2s; letter-spacing: 0.5px; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; }
+        .cancel-video-btn:hover { background: #0d47a1; transform: scale(1.03); }
+        .big-card-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 40; }
+        .big-card-overlay.show { display: flex; }
+        .big-card-display { background: transparent; text-align: center; max-width: 380px; width: 80%; animation: floatIn 0.4s ease; }
+        .big-card-display img { width: 100%; max-width: 320px; height: auto; object-fit: contain; border-radius: 24px; background: transparent; box-shadow: 0 0 40px rgba(5,255,161,0.3); }
+        @keyframes floatIn { from { transform: scale(0.7) translateY(30px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        
+        @media (max-width:580px){.pack-card{width:100%;}.pack-full-image{width:100%;height:auto;aspect-ratio:5/3;}.pack-stats{flex-direction:column;align-items:stretch;gap:10px;}.spin-button{width:100%;text-align:center;}.remaining-box{text-align:center;}}
+    </style>
+</head>
+<body>
+    <div class="draft-page-container">
+        <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+            <div class="back-home-btn" id="backHomeBtn"><i class="fas fa-home"></i> Back to Home</div>
+            <div class="pack-card">
+                <div class="pack-header"><strong>ALL ROUNDERS</strong><div class="more-details-btn" id="moreDetailsBtn">MORE DETAILS</div></div>
+                <div class="pack-image-area"><img class="pack-full-image" src="https://ik.imagekit.io/shaz/All%20Rounders%20(1).jpg" alt="pack"></div>
+                <div class="pack-stats"><div class="remaining-box">REMAINING: <span id="remainingCount">12</span></div><button class="spin-button" id="spinBtn">SPIN x 100</button></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIDEO OVERLAY -->
+    <div id="videoResultOverlay" class="video-result-overlay">
+        <div class="video-wrapper">
+            <video id="packVideo" muted playsinline>
+                <source src="https://ik.imagekit.io/shaz/download.mp4" type="video/mp4">
+            </video>
+            <button class="cancel-video-btn" id="cancelVideoBtn">✕ CANCEL</button>
+            <div id="bigCardOverlay" class="big-card-overlay">
+                <div class="big-card-display" id="resultCardContainer">
+                    <img id="resultCardImg" src="" alt="player card">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toastMsg" class="toast-msg"></div>
+    <script>
+        const packPlayersData = [
+            { name: "Shanaj", image: "https://ik.imagekit.io/shaz/Untitled%20design%20(2).jpg?updatedAt=1781007348026" },
+            { name: "Haseeb", image: "https://ik.imagekit.io/shaz/Untitled%20design%20(1).jpg" },
+            { name: "Bernando Silva", image: "https://ik.imagekit.io/shaz/BERNANDO%20SILVA_card.png?updatedAt=1780881032186" },
+            { name: "Vitinha", image: "https://ik.imagekit.io/shaz/VITINHA_card.png?updatedAt=1780881032215" },
+            { name: "Nuno Mendes", image: "https://ik.imagekit.io/shaz/NUNO%20MENDES%20_card.png?updatedAt=1780881032285" },
+            { name: "Bruno Fernandes", image: "https://ik.imagekit.io/shaz/BRUNO%20FERNANDES_card.png?updatedAt=1780881032246" },
+            { name: "Joao Neves", image: "https://ik.imagekit.io/shaz/JOAO%20NEVES_card%20(1).png?updatedAt=1780881032060" },
+            { name: "Rafael Leao", image: "https://ik.imagekit.io/shaz/RAFEAL%20LEAO_card.png?updatedAt=1780881031963" },
+            { name: "Ruben Dias", image: "https://ik.imagekit.io/shaz/RUBEN%20DIAS_card.png?updatedAt=1780881031062" },
+            { name: "Goncalo Inacio", image: "https://ik.imagekit.io/shaz/GON%C3%87ALO%20IN%C3%81CIO_card.png?updatedAt=1780881028475" },
+            { name: "Joao Cancelo", image: "https://ik.imagekit.io/shaz/JOAO%20CANCELO_card.png?updatedAt=1780881032300" },
+            { name: "Diago Costa", image: "https://ik.imagekit.io/shaz/DIAGO%20COSTA_card.png?updatedAt=1780881032251" }
+        ];
+        
+        // Special players that use the different video
+        const specialPlayers = ["Shanaj", "Haseeb"];
+        const specialVideoUrl = "https://ik.imagekit.io/shaz/df.mp4";
+        const defaultVideoUrl = "https://ik.imagekit.io/shaz/download.mp4";
+        
+        let remainingCount = 12;
+        let currentCoins = 0;
+        let myPlayers = [];
+
+        const playerStatsConfig = {
+            "Bernando Silva": { attackingAwareness: 80, ballControl: 84, dribbling: 82, tightPossession: 83 },
+            "Vitinha": { attackingAwareness: 76, ballControl: 80, dribbling: 78, tightPossession: 79 },
+            "Nuno Mendes": { attackingAwareness: 75, ballControl: 78, dribbling: 77, tightPossession: 79 },
+            "Bruno Fernandes": { attackingAwareness: 82, ballControl: 81, dribbling: 78, tightPossession: 80 },
+            "Joao Neves": { attackingAwareness: 74, ballControl: 77, dribbling: 76, tightPossession: 77 },
+            "Rafael Leao": { attackingAwareness: 76, ballControl: 74, dribbling: 73, tightPossession: 72 },
+            "Ruben Dias": { attackingAwareness: 71, ballControl: 73, dribbling: 72, tightPossession: 76 },
+            "Goncalo Inacio": { attackingAwareness: 79, ballControl: 82, dribbling: 80, tightPossession: 83 },
+            "Joao Cancelo": { attackingAwareness: 76, ballControl: 78, dribbling: 77, tightPossession: 79 },
+            "Diago Costa": { attackingAwareness: 75, ballControl: 79, dribbling: 77, tightPossession: 80 },
+            "Shanaj": { attackingAwareness: 94, ballControl: 93, dribbling: 92, tightPossession: 91 },
+            "Haseeb": { attackingAwareness: 84, ballControl: 83, dribbling: 82, tightPossession: 83 }
+        };
+        
+        const playerImages = {
+            "Shanaj": "https://ik.imagekit.io/shaz/Untitled%20design%20(2)-Photoroom.png",
+            "Haseeb": "https://ik.imagekit.io/shaz/Untitled%20design%20(1)-Photoroom.png",
+            "Bernando Silva": "https://ik.imagekit.io/shaz/BERNANDO%20SILVA_card-Photoroom.png",
+            "Vitinha": "https://ik.imagekit.io/shaz/VITINHA_card-Photoroom.png",
+            "Nuno Mendes": "https://ik.imagekit.io/shaz/NUNO%20MENDES%20_card-Photoroom.png",
+            "Bruno Fernandes": "https://ik.imagekit.io/shaz/BRUNO%20FERNANDES_card-Photoroom.png",
+            "Joao Neves": "https://ik.imagekit.io/shaz/JOAO%20NEVES_card%20(1)-Photoroom.png",
+            "Rafael Leao": "https://ik.imagekit.io/shaz/RAFEAL%20LEAO_card-Photoroom.png",
+            "Ruben Dias": "https://ik.imagekit.io/shaz/RUBEN%20DIAS_card-Photoroom.png",
+            "Goncalo Inacio": "https://ik.imagekit.io/shaz/GON%C3%87ALO%20IN%C3%81CIO_card-Photoroom.png",
+            "Joao Cancelo": "https://ik.imagekit.io/shaz/JOAO%20CANCELO_card-Photoroom.png",
+            "Diago Costa": "https://ik.imagekit.io/shaz/DIAGO%20COSTA_card.png?updatedAt=1780881032251"
+        };
+
+        function showToast(msg) {
+            let t = document.getElementById("toastMsg");
+            t.textContent = msg;
+            t.style.opacity = "1";
+            setTimeout(() => t.style.opacity = "0", 2000);
+        }
+
+        function getCoins() {
+            try {
+                if (window.parent && window.parent.currentCoins !== undefined) {
+                    return window.parent.currentCoins;
+                }
+                return parseInt(localStorage.getItem("hliga_coins")) || 0;
+            } catch (e) { return 0; }
+        }
+
+        function setCoins(coins) {
+            try {
+                if (window.parent && window.parent.currentCoins !== undefined) {
+                    window.parent.currentCoins = coins;
+                }
+                localStorage.setItem("hliga_coins", coins);
+            } catch (e) {}
+        }
+
+        function loadPlayers() {
+            try {
+                if (window.parent && window.parent.myPlayers) {
+                    myPlayers = window.parent.myPlayers;
+                } else {
+                    const stored = localStorage.getItem("hliga_players");
+                    if (stored) myPlayers = JSON.parse(stored);
+                }
+                if (!Array.isArray(myPlayers)) myPlayers = [];
+            } catch (e) { myPlayers = []; }
+        }
+
+        function savePlayers() {
+            try {
+                if (window.parent && window.parent.myPlayers) {
+                    window.parent.myPlayers = myPlayers;
+                }
+                localStorage.setItem("hliga_players", JSON.stringify(myPlayers));
+            } catch (e) {}
+        }
+
+        function addPlayerToCollection(player) {
+            loadPlayers();
+            const existing = myPlayers.find(p => p.name === player.name);
+            if (!existing) {
+                const stats = playerStatsConfig[player.name] || { 
+                    attackingAwareness: 40 + Math.floor(Math.random() * 10), 
+                    ballControl: 40 + Math.floor(Math.random() * 10), 
+                    dribbling: 40 + Math.floor(Math.random() * 10), 
+                    tightPossession: 40 + Math.floor(Math.random() * 10) 
+                };
+                myPlayers.push({
+                    name: player.name,
+                    image: playerImages[player.name] || player.image,
+                    level: 1,
+                    trainingUsed: { 50: 0, 100: 0, 150: 0 },
+                    stats: stats
+                });
+            } else {
+                existing.level = Math.min(existing.level + 1, 32);
+            }
+            savePlayers();
+            
+            // Update parent UI
+            try {
+                if (window.parent && window.parent.updateUI) {
+                    window.parent.updateUI();
+                }
+            } catch (e) {}
+        }
+
+        function performSpin() {
+            currentCoins = getCoins();
+            if (remainingCount <= 0) { showToast("No spins left!"); return; }
+            if (currentCoins < 100) { showToast(`Need 100 coins! You have ${currentCoins}`); return; }
+            currentCoins -= 100;
+            setCoins(currentCoins);
+            remainingCount--;
+            document.getElementById("remainingCount").innerHTML = remainingCount;
+            localStorage.setItem("hliga_remaining", remainingCount);
+
+            const newPlayer = packPlayersData[Math.floor(Math.random() * packPlayersData.length)];
+            
+            // Check if special player
+            const isSpecial = specialPlayers.includes(newPlayer.name);
+            const videoUrl = isSpecial ? specialVideoUrl : defaultVideoUrl;
+            
+            // Show video overlay
+            const overlay = document.getElementById("videoResultOverlay");
+            const video = document.getElementById("packVideo");
+            const bigCardOverlay = document.getElementById("bigCardOverlay");
+            const resultImg = document.getElementById("resultCardImg");
+            
+            // Set video source
+            video.querySelector('source').src = videoUrl;
+            video.load();
+            
+            bigCardOverlay.classList.remove("show");
+            bigCardOverlay.style.display = "none";
+            video.currentTime = 0;
+            overlay.classList.add("active");
+            
+            video.play().catch(e => console.warn("autoplay blocked", e));
+            
+            const onEnded = () => {
+                video.removeEventListener('ended', onEnded);
+                resultImg.src = newPlayer.image;
+                bigCardOverlay.style.display = "flex";
+                bigCardOverlay.classList.add("show");
+            };
+            video.addEventListener('ended', onEnded);
+            
+            document.getElementById("cancelVideoBtn").onclick = () => {
+                video.pause();
+                video.currentTime = 0;
+                bigCardOverlay.classList.remove("show");
+                bigCardOverlay.style.display = "none";
+                overlay.classList.remove("active");
+            };
+            
+            document.getElementById("resultCardContainer").onclick = () => {
+                video.pause();
+                overlay.classList.remove("active");
+                // Add player to collection after video
+                addPlayerToCollection(newPlayer);
+                showToast(`🎉 You got ${newPlayer.name}!`);
+                // Update the collection page if visible
+                if (window.parent && window.parent.renderPlayersPage) {
+                    window.parent.renderPlayersPage();
+                }
+            };
+            
+            // Also add player when video ends (if user doesn't click card)
+            const addOnEnd = () => {
+                // Only add if not already added (check if player exists)
+                loadPlayers();
+                const exists = myPlayers.find(p => p.name === newPlayer.name);
+                if (!exists) {
+                    addPlayerToCollection(newPlayer);
+                }
+                video.removeEventListener('ended', addOnEnd);
+            };
+            video.addEventListener('ended', addOnEnd);
+        }
+
+        document.getElementById("spinBtn")?.addEventListener("click", performSpin);
+        
+        document.getElementById("moreDetailsBtn")?.addEventListener("click", function() {
+            const names = packPlayersData.map(p => p.name).join(", ");
+            showToast(`Pack contains: ${names}`);
+        });
+        
+        document.getElementById("backHomeBtn")?.addEventListener("click", function() {
+            // Close video if open
+            document.getElementById("videoResultOverlay").classList.remove("active");
+            if (window.parent && window.parent.showHome) {
+                window.parent.showHome();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Load remaining count from localStorage
+        try {
+            const stored = localStorage.getItem("hliga_remaining");
+            if (stored) remainingCount = parseInt(stored) || 12;
+            document.getElementById("remainingCount").innerHTML = remainingCount;
+        } catch (e) {}
+        
+        // Save remaining count when changed
+        setInterval(() => {
+            localStorage.setItem("hliga_remaining", remainingCount);
+        }, 1000);
+    </script>
+</body>
+</html>
