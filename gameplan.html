@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HLIGA · Game Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0c; font-family: 'Inter', sans-serif; color: #eef2ff; }
+        .gameplan-container { background: rgba(19,20,31,0.95); border-radius: 1.5rem; padding: 2rem; border: 1px solid #ff2a6d; min-height: 80vh; max-width: 1400px; margin: 0 auto; }
+        .gameplan-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #ff2a6d40; padding-bottom: 16px; }
+        .gameplan-header .header-left { display: flex; align-items: center; gap: 16px; }
+        .gameplan-header .header-left h2 { color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; font-size: 1.6rem; }
+        .gameplan-header .header-right .coins-display { background: rgba(5,255,161,0.15); padding: 0.4rem 1rem; border-radius: 40px; display: flex; align-items: center; gap: 8px; border: 1px solid #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .gameplan-body { display: flex; flex-direction: row; gap: 30px; flex-wrap: wrap; }
+        .gameplan-sidebar { flex: 0 0 300px; min-width: 240px; }
+        .gameplan-pitch-area { flex: 1; min-width: 350px; }
+        .team-info { background: #0f111c; border-radius: 16px; padding: 16px 20px; border: 1px solid #ff2a6d40; margin-bottom: 16px; }
+        .team-info .team-name-input { width: 100%; padding: 10px 14px; border-radius: 40px; background: #1a1c2e; border: 1px solid #ff2a6d60; color: white; font-family: 'Black Ops One', 'Inter', sans-serif; font-size: 1rem; outline: none; }
+        .team-info .team-name-input:focus { border-color: #05ffa1; }
+        .team-info .section-label { color: #7a85a0; font-size: 0.8rem; font-family: 'Black Ops One', 'Inter', sans-serif; letter-spacing: 0.5px; margin-top: 12px; margin-bottom: 8px; display: block; }
+        .logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 6px; max-height: 160px; overflow-y: auto; padding: 6px 0; }
+        .logo-grid .logo-option { width: 44px; height: 44px; border-radius: 10px; border: 2px solid #ff2a6d40; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 3px; background: #1a1c2e; transition: 0.2s; }
+        .logo-grid .logo-option:hover { border-color: #05ffa1; transform: scale(1.05); }
+        .logo-grid .logo-option.selected { border-color: #05ffa1; box-shadow: 0 0 20px rgba(5,255,161,0.3); }
+        .logo-grid .logo-option img { width: 100%; height: 100%; object-fit: contain; }
+        .selected-team-display { display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: #1a1c2e; border-radius: 12px; margin-top: 10px; border: 1px solid #ff2a6d40; }
+        .selected-team-display img { width: 36px; height: 36px; object-fit: contain; }
+        .selected-team-display .team-name-display { color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-size: 1rem; }
+        .collective-strength { background: #1a1c2e; border-radius: 12px; padding: 14px 18px; border: 1px solid #05ffa1; display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+        .collective-strength .cs-label { color: #7a85a0; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; font-size: 0.9rem; }
+        .collective-strength .cs-value { color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; font-size: 1.8rem; }
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .jersey-btn { background: linear-gradient(135deg, #ff2a6d, #b0104a); border: none; color: white; padding: 14px 20px; border-radius: 40px; cursor: pointer; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.2s; font-size: 1.1rem; box-shadow: 0 0 20px rgba(255,42,109,0.3); width: 100%; }
+        .jersey-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(255,42,109,0.5); }
+        .formation-btn { background: rgba(5,255,161,0.15); border: 1px solid #05ffa1; color: #05ffa1; padding: 12px 20px; border-radius: 40px; cursor: pointer; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.2s; font-size: 1rem; width: 100%; }
+        .formation-btn:hover { background: #05ffa1; color: #0a0a0c; }
+        .formation-selector { display: none; background: #1a1c2e; border-radius: 12px; padding: 12px; border: 1px solid #ff2a6d60; margin-top: 8px; flex-wrap: wrap; gap: 6px; }
+        .formation-selector.active { display: flex; }
+        .formation-selector .fmt-btn { background: #0f111c; border: 1px solid #ff2a6d40; color: #a8b3cf; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-family: 'Black Ops One', 'Inter', sans-serif; font-size: 0.75rem; transition: 0.2s; }
+        .formation-selector .fmt-btn:hover { border-color: #05ffa1; color: white; }
+        .formation-selector .fmt-btn.active { border-color: #05ffa1; color: #05ffa1; background: #05ffa110; }
+        .pitch-area { background: #0f111c; border-radius: 16px; padding: 20px; border: 1px solid #ff2a6d40; position: relative; overflow: hidden; min-height: 420px; }
+        .pitch-area .pitch-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; z-index: 0; border-radius: 16px; }
+        .pitch-area .pitch-title { color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; font-size: 1.2rem; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+        .pitch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 500px; margin: 0 auto; position: relative; z-index: 1; }
+        .pitch-box { aspect-ratio: 0.9; background: rgba(26,28,46,0.8); backdrop-filter: blur(4px); border: 2px dashed #ff2a6d60; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; padding: 3px; min-height: 55px; position: relative; overflow: hidden; }
+        .pitch-box:hover { border-color: #05ffa1; background: rgba(255,42,109,0.15); }
+        .pitch-box.filled { border: 2px solid #05ffa1; background: rgba(5,255,161,0.1); }
+        .pitch-box .player-card-img { width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; border-radius: 8px; }
+        .pitch-box .player-ovr-badge { position: absolute; top: 2px; left: 4px; font-size: 0.55rem; font-weight: 700; color: white; z-index: 5; background: transparent; border: none; box-shadow: none; text-shadow: 0 0 8px rgba(0,0,0,0.9); font-family: 'Black Ops One', 'Inter', sans-serif; line-height: 1.1; }
+        .pitch-box .position-label { font-size: 0.5rem; color: #7a85a0; font-family: 'Black Ops One', 'Inter', sans-serif; letter-spacing: 0.3px; z-index: 2; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+        .pitch-box .remove-player { position: absolute; top: -4px; right: -4px; background: #ff2a6d; border: none; color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 0.5rem; cursor: pointer; display: none; z-index: 10; align-items: center; justify-content: center; }
+        .pitch-box.filled .remove-player { display: flex; }
+        .pitch-box .player-name-label { position: absolute; bottom: 1px; left: 0; right: 0; font-size: 0.4rem; color: #a8b3cf; text-align: center; font-family: 'Black Ops One', 'Inter', sans-serif; letter-spacing: 0.2px; background: rgba(0,0,0,0.6); padding: 1px 3px; z-index: 5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pitch-hint { margin-top: 14px; text-align: center; color: #7a85a0; font-size: 0.7rem; font-family: 'Black Ops One', 'Inter', sans-serif; letter-spacing: 0.5px; border-top: 1px solid #ff2a6d20; padding-top: 14px; position: relative; z-index: 1; }
+        .pitch-section-label { color: #7a85a0; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; font-size: 0.65rem; text-align: center; padding: 4px 0; position: relative; z-index: 1; border-bottom: 1px solid #ff2a6d20; margin-bottom: 6px; grid-column: 1 / -1; }
+        .back-home-btn { background: rgba(5,255,161,0.2); border: 1px solid #05ffa1; border-radius: 40px; padding: 8px 20px; font-weight: bold; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #eef2ff; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .back-home-btn:hover { background: #05ffa1; color: #0a0a0c; }
+        .toast-msg { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #ff2a6d; color: white; padding: 8px 22px; border-radius: 60px; z-index: 2100; opacity: 0; transition: 0.2s; pointer-events: none; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        @media (max-width:780px){.gameplan-body{flex-direction:column;}.gameplan-sidebar{flex:1;min-width:unset;}.gameplan-pitch-area{min-width:unset;}.pitch-grid{grid-template-columns:repeat(4,1fr);gap:6px;max-width:100%;}.pitch-box{min-height:50px;}}
+        @media (max-width:480px){.pitch-grid{grid-template-columns:repeat(4,1fr);gap:4px;}.pitch-box{min-height:40px;}.pitch-box .player-ovr-badge{font-size:0.45rem;top:1px;left:3px;}.pitch-box .player-name-label{font-size:0.35rem;}.pitch-box .position-label{font-size:0.4rem;}}
+    </style>
+</head>
+<body>
+    <div id="dynamicMainArea">
+        <div class="gameplan-container">
+            <div class="gameplan-header">
+                <div class="header-left">
+                    <div class="back-home-btn" id="backHomeBtn"><i class="fas fa-home"></i> Back</div>
+                    <h2><i class="fas fa-chalkboard-user"></i> GAME PLAN</h2>
+                </div>
+                <div class="header-right">
+                    <div class="coins-display"><i class="fas fa-coins"></i> <span id="coinDisplay">0</span></div>
+                </div>
+            </div>
+            <div class="gameplan-body">
+                <div class="gameplan-sidebar">
+                    <div class="team-info">
+                        <input class="team-name-input" id="teamNameInput" type="text" placeholder="Enter team name...">
+                        <span class="section-label"><i class="fas fa-image"></i> Select Team Logo</span>
+                        <div class="logo-grid" id="logoGrid"></div>
+                        <div class="selected-team-display" id="selectedTeamDisplay">
+                            <span style="color:#7a85a0;font-size:0.9rem;">No logo selected</span>
+                            <span class="team-name-display">Team Name</span>
+                        </div>
+                        <div class="collective-strength">
+                            <span class="cs-label"><i class="fas fa-users"></i> Collective Strength</span>
+                            <span class="cs-value" id="collectiveStrength">0</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="jersey-btn" id="jerseyBtn"><i class="fas fa-tshirt"></i> Select Players</button>
+                            <button class="formation-btn" id="formationToggle"><i class="fas fa-arrows-alt-h"></i> Change Formation</button>
+                            <div class="formation-selector" id="formationSelector"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gameplan-pitch-area">
+                    <div class="pitch-area">
+                        <img class="pitch-bg" src="https://ik.imagekit.io/shaz/ChatGPT%20Image%20Jul%203,%202026,%2010_26_34%20AM-Photoroom.png" onerror="this.style.display='none'">
+                        <div class="pitch-title"><i class="fas fa-futbol"></i> Starting XI</div>
+                        <div class="pitch-grid" id="pitchGrid"></div>
+                        <div class="pitch-hint"><i class="fas fa-info-circle"></i> Click a box to assign a player</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toastMsg" class="toast-msg"></div>
+    <script>
+        // Team logos data
+        const teamLogos = [
+            { name: "Real Madrid", url: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
+            { name: "FC Barcelona", url: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
+            { name: "Manchester United", url: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
+            { name: "Liverpool", url: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" },
+            { name: "Manchester City", url: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg" },
+            { name: "Chelsea", url: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" },
+            { name: "Arsenal", url: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" },
+            { name: "PSG", url: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg" },
+            { name: "Juventus", url: "https://upload.wikimedia.org/wikipedia/commons/1/15/Juventus_FC_2017_logo.svg" },
+            { name: "Bayern Munich", url: "https://upload.wikimedia.org/wikipedia/commons/1/1f/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg" },
+            { name: "Borussia Dortmund", url: "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg" },
+            { name: "AC Milan", url: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" },
+            { name: "Inter Milan", url: "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg" },
+            { name: "Atletico Madrid", url: "https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg" },
+            { name: "Tottenham", url: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg" },
+            { name: "Brazil NT", url: "https://upload.wikimedia.org/wikipedia/en/0/05/Brazilian_Football_Confederation_logo.svg" },
+            { name: "Argentina NT", url: "https://upload.wikimedia.org/wikipedia/en/1/1a/AFA_logo.svg" },
+            { name: "France NT", url: "https://upload.wikimedia.org/wikipedia/en/c/c7/French_Football_Federation.svg" },
+            { name: "Germany NT", url: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFB_logo.svg" },
+            { name: "Spain NT", url: "https://upload.wikimedia.org/wikipedia/en/3/35/Spain_national_football_team_crest.svg" },
+            { name: "England NT", url: "https://upload.wikimedia.org/wikipedia/en/8/8b/England_national_football_team_crest.svg" },
+            { name: "Portugal NT", url: "https://upload.wikimedia.org/wikipedia/en/5/5c/Portuguese_Football_Federation.svg" },
+            { name: "Italy NT", url: "https://upload.wikimedia.org/wikipedia/en/9/97/FIGC_logo.svg" },
+            { name: "Netherlands NT", url: "https://upload.wikimedia.org/wikipedia/en/7/7f/Royal_Dutch_Football_Association_logo.svg" },
+            { name: "Belgium NT", url: "https://upload.wikimedia.org/wikipedia/en/9/93/Royal_Belgian_FA_logo.svg" },
+            { name: "Croatia NT", url: "https://upload.wikimedia.org/wikipedia/en/f/f2/Croatian_Football_Federation_logo.svg" },
+            { name: "Japan NT", url: "https://upload.wikimedia.org/wikipedia/en/3/34/Japan_Football_Association.svg" },
+            { name: "South Korea NT", url: "https://upload.wikimedia.org/wikipedia/en/8/82/Korea_Football_Association_logo.svg" },
+            { name: "Mexico NT", url: "https://upload.wikimedia.org/wikipedia/en/6/69/Federacion_Mexicana_de_Futbol_logo.svg" },
+            { name: "Morocco NT", url: "https://upload.wikimedia.org/wikipedia/en/0/0f/Royal_Moroccan_Football_Federation_logo.svg" }
+        ];
+
+        const formations = [
+            { name: "4-4-2", positions: ["ST","ST","LM","CM","CM","RM","LB","CB","CB","RB","GK"] },
+            { name: "4-3-3", positions: ["LW","ST","RW","CM","CDM","CM","LB","CB","CB","RB","GK"] },
+            { name: "3-5-2", positions: ["ST","ST","LM","CM","CDM","CM","RM","CB","CB","CB","GK"] },
+            { name: "5-4-1", positions: ["ST","LM","CM","CM","RM","LB","CB","CB","CB","RB","GK"] },
+            { name: "4-2-3-1", positions: ["ST","LW","CAM","RW","CDM","CDM","LB","CB","CB","RB","GK"] },
+            { name: "5-3-2", positions: ["ST","ST","CM","CM","CM","LWB","CB","CB","CB","RWB","GK"] }
+        ];
+
+        let currentFormation = formations[0];
+        let gamePlanPositions = {};
+        let gamePlanTeamName = "";
+        let gamePlanSelectedLogo = "";
+        let myPlayers = [];
+
+        // Player stats configuration for OVR calculation
+        const playerStatsConfig = {
+            "Bernando Silva": { attackingAwareness: 80, ballControl: 84, dribbling: 82, tightPossession: 83 },
+            "Vitinha": { attackingAwareness: 76, ballControl: 80, dribbling: 78, tightPossession: 79 },
+            "Nuno Mendes": { attackingAwareness: 75, ballControl: 78, dribbling: 77, tightPossession: 79 },
+            "Bruno Fernandes": { attackingAwareness: 82, ballControl: 81, dribbling: 78, tightPossession: 80 },
+            "Joao Neves": { attackingAwareness: 74, ballControl: 77, dribbling: 76, tightPossession: 77 },
+            "Rafael Leao": { attackingAwareness: 76, ballControl: 74, dribbling: 73, tightPossession: 72 },
+            "Ruben Dias": { attackingAwareness: 71, ballControl: 73, dribbling: 72, tightPossession: 76 },
+            "Goncalo Inacio": { attackingAwareness: 79, ballControl: 82, dribbling: 80, tightPossession: 83 },
+            "Joao Cancelo": { attackingAwareness: 76, ballControl: 78, dribbling: 77, tightPossession: 79 },
+            "Diago Costa": { attackingAwareness: 75, ballControl: 79, dribbling: 77, tightPossession: 80 },
+            "Shanaj": { attackingAwareness: 94, ballControl: 93, dribbling: 92, tightPossession: 91 },
+            "Haseeb": { attackingAwareness: 84, ballControl: 83, dribbling: 82, tightPossession: 83 }
+        };
+
+        function showToast(msg) {
+            let t = document.getElementById("toastMsg");
+            t.textContent = msg;
+            t.style.opacity = "1";
+            setTimeout(() => t.style.opacity = "0", 2000);
+        }
+
+        function getOvrBonus(level) {
+            if (level >= 32) return 4;
+            if (level >= 24) return 3;
+            if (level >= 16) return 2;
+            if (level >= 8) return 1;
+            return 0;
+        }
+
+        function getPlayerOverall(player) {
+            if (!player) return 0;
+            if (!player.stats) {
+                const config = playerStatsConfig[player.name];
+                if (config) player.stats = { ...config };
+                else player.stats = { attackingAwareness: 40 + Math.floor(Math.random() * 10), ballControl: 40 + Math.floor(Math.random() * 10), dribbling: 40 + Math.floor(Math.random() * 10), tightPossession: 40 + Math.floor(Math.random() * 10) };
+            }
+            const base = playerStatsConfig[player.name];
+            if (!base) {
+                return Math.round((player.stats.attackingAwareness + player.stats.ballControl + player.stats.dribbling + player.stats.tightPossession) / 4);
+            }
+            const baseOvr = Math.round((base.attackingAwareness + base.ballControl + base.dribbling + base.tightPossession) / 4);
+            const bonus = getOvrBonus(player.level || 1);
+            const inc = (player.stats.attackingAwareness - base.attackingAwareness) + 
+                        (player.stats.ballControl - base.ballControl) + 
+                        (player.stats.dribbling - base.dribbling) + 
+                        (player.stats.tightPossession - base.tightPossession);
+            return Math.round(baseOvr + (inc / 4) + bonus);
+        }
+
+        function loadData() {
+            try {
+                // Load players from parent or localStorage
+                if (window.parent && window.parent.myPlayers) {
+                    myPlayers = window.parent.myPlayers;
+                } else {
+                    const stored = localStorage.getItem("hliga_players");
+                    if (stored) myPlayers = JSON.parse(stored);
+                }
+                // Ensure all players have proper stats
+                myPlayers.forEach(p => {
+                    if (!p.stats) {
+                        const config = playerStatsConfig[p.name];
+                        if (config) p.stats = { ...config };
+                        else p.stats = { attackingAwareness: 40 + Math.floor(Math.random() * 10), ballControl: 40 + Math.floor(Math.random() * 10), dribbling: 40 + Math.floor(Math.random() * 10), tightPossession: 40 + Math.floor(Math.random() * 10) };
+                    }
+                    if (!p.level) p.level = 1;
+                    if (!p.trainingUsed) p.trainingUsed = { 50: 0, 100: 0, 150: 0 };
+                });
+            } catch (e) { myPlayers = []; }
+            
+            // Load game plan
+            const storedPlan = localStorage.getItem("hliga_gameplan");
+            if (storedPlan) {
+                try {
+                    const plan = JSON.parse(storedPlan);
+                    gamePlanTeamName = plan.teamName || "";
+                    gamePlanSelectedLogo = plan.logo || "";
+                    gamePlanPositions = plan.positions || {};
+                } catch (e) {}
+            }
+            renderGamePlan();
+        }
+
+        function getPlayerByName(name) {
+            return myPlayers.find(p => p.name === name);
+        }
+
+        function calculateCollectiveStrength() {
+            let total = 0, count = 0;
+            for (let i = 0; i < 11; i++) {
+                if (gamePlanPositions[i]) {
+                    const player = getPlayerByName(gamePlanPositions[i]);
+                    if (player) { total += getPlayerOverall(player); count++; }
+                }
+            }
+            return count > 0 ? Math.round(total / count) : 0;
+        }
+
+        function renderGamePlan() {
+            const posNames = currentFormation.positions;
+            let pitchHtml = '';
+            const sectionOrder = [
+                { start: 0, end: 2, label: "FORWARDS" },
+                { start: 2, end: 7, label: "MIDFIELDERS" },
+                { start: 7, end: 10, label: "DEFENDERS" },
+                { start: 10, end: 11, label: "GOALKEEPER" }
+            ];
+            for (let s = 0; s < sectionOrder.length; s++) {
+                const sec = sectionOrder[s];
+                pitchHtml += `<div class="pitch-section-label">${sec.label}</div>`;
+                for (let i = sec.start; i < sec.end; i++) {
+                    const posName = posNames[i] || `Pos ${i+1}`;
+                    const playerName = gamePlanPositions[i] || "";
+                    const player = playerName ? getPlayerByName(playerName) : null;
+                    const filled = player ? 'filled' : '';
+                    const ovr = player ? getPlayerOverall(player) : '';
+                    const imgSrc = player ? player.image : '';
+                    pitchHtml += `
+                        <div class="pitch-box ${filled}" data-index="${i}">
+                            ${player ? `
+                                <img class="player-card-img" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/80/1a1c2e/7a85a0?text=${player.name.charAt(0)}'">
+                                <span class="player-ovr-badge">${ovr}</span>
+                                <span class="player-name-label">${player.name}</span>
+                            ` : `
+                                <span class="position-label">${posName}</span>
+                            `}
+                            <button class="remove-player" data-index="${i}" title="Remove player">✕</button>
+                        </div>
+                    `;
+                }
+            }
+
+            const grid = document.getElementById("pitchGrid");
+            if (grid) grid.innerHTML = pitchHtml;
+
+            // Render logos
+            const logoGrid = document.getElementById("logoGrid");
+            if (logoGrid) {
+                logoGrid.innerHTML = teamLogos.map(l => `
+                    <div class="logo-option ${gamePlanSelectedLogo === l.url ? 'selected' : ''}" data-logo="${l.url}" title="${l.name}">
+                        <img src="${l.url}" onerror="this.src='https://via.placeholder.com/44/ff2a6d/ffffff?text=${l.name.charAt(0)}'">
+                    </div>
+                `).join('');
+            }
+
+            // Update selected team display
+            const display = document.getElementById("selectedTeamDisplay");
+            if (display) {
+                const logo = gamePlanSelectedLogo ? `<img src="${gamePlanSelectedLogo}" onerror="this.src='https://via.placeholder.com/36/ff2a6d/ffffff?text=?'">` :
+                    '<span style="color:#7a85a0;font-size:0.9rem;">No logo selected</span>';
+                display.innerHTML = `${logo}<span class="team-name-display">${gamePlanTeamName || 'Team Name'}</span>`;
+            }
+
+            // Update team name input
+            const input = document.getElementById("teamNameInput");
+            if (input) input.value = gamePlanTeamName;
+
+            // Update collective strength
+            document.getElementById("collectiveStrength").innerHTML = calculateCollectiveStrength();
+
+            // Render formation buttons
+            const fmtSelector = document.getElementById("formationSelector");
+            if (fmtSelector) {
+                fmtSelector.innerHTML = formations.map(f => `
+                    <button class="fmt-btn ${f.name === currentFormation.name ? 'active' : ''}" data-fmt="${f.name}">${f.name}</button>
+                `).join('');
+            }
+
+            // Update coin display
+            let coins = 0;
+            try {
+                if (window.parent && window.parent.currentCoins !== undefined) coins = window.parent.currentCoins;
+                else coins = parseInt(localStorage.getItem("hliga_coins")) || 0;
+            } catch (e) {}
+            document.getElementById("coinDisplay").innerHTML = coins;
+
+            // Event listeners
+            document.querySelectorAll('.pitch-box').forEach(box => {
+                box.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-player')) return;
+                    const index = this.dataset.index;
+                    // Open player selection - show available players
+                    const availablePlayers = myPlayers.filter(p => !Object.values(gamePlanPositions).includes(p.name));
+                    if (availablePlayers.length === 0) {
+                        showToast("No available players! Spin the pack to get more.");
+                        return;
+                    }
+                    // Simple selection - assign first available player
+                    const player = availablePlayers[0];
+                    gamePlanPositions[index] = player.name;
+                    saveGamePlan();
+                    renderGamePlan();
+                    showToast(`${player.name} assigned to position ${parseInt(index)+1}`);
+                });
+            });
+
+            document.querySelectorAll('.remove-player').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = this.dataset.index;
+                    delete gamePlanPositions[index];
+                    saveGamePlan();
+                    renderGamePlan();
+                    showToast("Player removed");
+                });
+            });
+
+            document.querySelectorAll('.logo-option').forEach(el => {
+                el.addEventListener('click', function() {
+                    document.querySelectorAll('.logo-option').forEach(l => l.classList.remove('selected'));
+                    this.classList.add('selected');
+                    gamePlanSelectedLogo = this.dataset.logo;
+                    saveGamePlan();
+                    renderGamePlan();
+                });
+            });
+
+            document.getElementById("teamNameInput")?.addEventListener("input", function() {
+                gamePlanTeamName = this.value;
+                saveGamePlan();
+                renderGamePlan();
+            });
+
+            document.getElementById("formationToggle")?.addEventListener("click", function() {
+                document.getElementById("formationSelector")?.classList.toggle("active");
+            });
+
+            document.querySelectorAll('.fmt-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const fmtName = this.dataset.fmt;
+                    const found = formations.find(f => f.name === fmtName);
+                    if (found) {
+                        currentFormation = found;
+                        gamePlanPositions = {};
+                        saveGamePlan();
+                        renderGamePlan();
+                    }
+                });
+            });
+
+            document.getElementById("jerseyBtn")?.addEventListener("click", function() {
+                const available = myPlayers.filter(p => !Object.values(gamePlanPositions).includes(p.name));
+                if (available.length === 0) {
+                    showToast("No available players! Spin the pack to get more.");
+                    return;
+                }
+                // Assign first available to first empty position
+                for (let i = 0; i < 11; i++) {
+                    if (!gamePlanPositions[i]) {
+                        gamePlanPositions[i] = available[0].name;
+                        saveGamePlan();
+                        renderGamePlan();
+                        showToast(`${available[0].name} assigned to position ${i+1}`);
+                        return;
+                    }
+                }
+                showToast("All positions are filled!");
+            });
+        }
+
+        function saveGamePlan() {
+            const plan = { teamName: gamePlanTeamName, logo: gamePlanSelectedLogo, positions: gamePlanPositions };
+            localStorage.setItem("hliga_gameplan", JSON.stringify(plan));
+            try {
+                if (window.parent && window.parent.saveGamePlanData) {
+                    window.parent.saveGamePlanData(plan);
+                }
+            } catch (e) {}
+        }
+
+        // Save players to parent/localStorage when changed
+        function syncPlayers() {
+            try {
+                if (window.parent && window.parent.myPlayers) {
+                    window.parent.myPlayers = myPlayers;
+                }
+                localStorage.setItem("hliga_players", JSON.stringify(myPlayers));
+            } catch (e) {}
+        }
+
+        document.getElementById("backHomeBtn")?.addEventListener("click", function() {
+            syncPlayers();
+            saveGamePlan();
+            if (window.parent && window.parent.showHome) {
+                window.parent.showHome();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Load data and render
+        loadData();
+        
+        // Update OVR badges periodically to reflect training changes
+        setInterval(() => {
+            // Check if any player stats changed
+            let changed = false;
+            myPlayers.forEach(p => {
+                if (p.stats) {
+                    const old = p._lastOvr || 0;
+                    const current = getPlayerOverall(p);
+                    if (old !== current) {
+                        p._lastOvr = current;
+                        changed = true;
+                    }
+                }
+            });
+            if (changed) {
+                renderGamePlan();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
