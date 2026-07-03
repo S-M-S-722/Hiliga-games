@@ -261,6 +261,7 @@
                     const stored = localStorage.getItem("hliga_players");
                     if (stored) myPlayers = JSON.parse(stored);
                 }
+                if (!Array.isArray(myPlayers)) myPlayers = [];
                 // Ensure all players have proper stats
                 myPlayers.forEach(p => {
                     if (!p.stats) {
@@ -317,8 +318,13 @@
                 `;
             }).join('');
 
+            // Attach click events to player rows
             document.querySelectorAll(".player-row").forEach(row => {
-                row.addEventListener("click", function() {
+                // Remove old listeners to avoid duplicates
+                const newRow = row.cloneNode(true);
+                row.parentNode.replaceChild(newRow, row);
+                
+                newRow.addEventListener("click", function() {
                     const data = this.getAttribute("data-player");
                     if (data) {
                         try {
@@ -423,7 +429,10 @@
             }).join('');
 
             document.querySelectorAll('.arrow-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const statKey = this.getAttribute('data-stat');
                     const dir = parseInt(this.getAttribute('data-dir'));
@@ -574,7 +583,10 @@
 
         // ----- TAB SWITCHING -----
         document.querySelectorAll('.detail-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
+            const newTab = tab.cloneNode(true);
+            tab.parentNode.replaceChild(newTab, tab);
+            
+            newTab.addEventListener('click', function() {
                 document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 const tabName = this.getAttribute('data-tab');
@@ -606,7 +618,15 @@
             }
         });
 
-        loadPlayers();
+        // Load data when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPlayers();
+        });
+        
+        // Also load immediately if DOM already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            loadPlayers();
+        }
         
         // Periodically sync and update OVR badges
         setInterval(() => {
