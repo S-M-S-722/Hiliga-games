@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HLIGA · Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0c; font-family: 'Inter', sans-serif; color: #eef2ff; }
+        .leaderboard-container { background: rgba(19,20,31,0.95); border-radius: 1.5rem; padding: 2rem; border: 1px solid #ff2a6d; min-height: 60vh; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .leaderboard-container h2 { color: #05ffa1; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; margin-bottom: 16px; font-size: 2rem; }
+        .leaderboard-container .empty-state { color: #7a85a0; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; font-size: 1.1rem; }
+        .leaderboard-container .empty-state i { font-size: 3rem; display: block; margin-bottom: 16px; color: #ff2a6d40; }
+        .back-home-btn { background: rgba(5,255,161,0.2); border: 1px solid #05ffa1; border-radius: 40px; padding: 8px 20px; font-weight: bold; margin-top: 20px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #eef2ff; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+        .back-home-btn:hover { background: #05ffa1; color: #0a0a0c; }
+        .toast-msg { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #ff2a6d; color: white; padding: 8px 22px; border-radius: 60px; z-index: 2100; opacity: 0; transition: 0.2s; pointer-events: none; font-family: 'Black Ops One', 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+    <div class="leaderboard-container">
+        <h2><i class="fas fa-trophy"></i> LEADERBOARD</h2>
+        <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <p>No leaderboard data available yet.</p>
+            <p style="margin-top: 8px; font-size: 0.9rem;">Start collecting and training players to climb the ranks!</p>
+        </div>
+        <div class="back-home-btn" id="backHomeBtn"><i class="fas fa-home"></i> Back to Home</div>
+    </div>
+    <div id="toastMsg" class="toast-msg"></div>
+    <script>
+        document.getElementById("backHomeBtn")?.addEventListener("click", function() {
+            if (window.parent && window.parent.showHome) {
+                window.parent.showHome();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+    </script>
+</body>
+</html>
