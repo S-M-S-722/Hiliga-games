@@ -235,11 +235,20 @@
             
             video.play().catch(e => console.warn("autoplay blocked", e));
             
+            // Store player to add after video
+            let playerAdded = false;
+            
             const onEnded = () => {
                 video.removeEventListener('ended', onEnded);
                 resultImg.src = newPlayer.image;
                 bigCardOverlay.style.display = "flex";
                 bigCardOverlay.classList.add("show");
+                // Auto-add player when video ends
+                if (!playerAdded) {
+                    addPlayerToCollection(newPlayer);
+                    playerAdded = true;
+                    showToast(`🎉 You got ${newPlayer.name}!`);
+                }
             };
             video.addEventListener('ended', onEnded);
             
@@ -249,49 +258,55 @@
                 bigCardOverlay.classList.remove("show");
                 bigCardOverlay.style.display = "none";
                 overlay.classList.remove("active");
+                if (!playerAdded) {
+                    addPlayerToCollection(newPlayer);
+                    playerAdded = true;
+                    showToast(`🎉 You got ${newPlayer.name}!`);
+                }
             };
             
             document.getElementById("resultCardContainer").onclick = () => {
                 video.pause();
                 overlay.classList.remove("active");
-                // Add player to collection after video
-                addPlayerToCollection(newPlayer);
-                showToast(`🎉 You got ${newPlayer.name}!`);
+                if (!playerAdded) {
+                    addPlayerToCollection(newPlayer);
+                    playerAdded = true;
+                    showToast(`🎉 You got ${newPlayer.name}!`);
+                }
                 // Update the collection page if visible
                 if (window.parent && window.parent.renderPlayersPage) {
                     window.parent.renderPlayersPage();
                 }
             };
-            
-            // Also add player when video ends (if user doesn't click card)
-            const addOnEnd = () => {
-                // Only add if not already added (check if player exists)
-                loadPlayers();
-                const exists = myPlayers.find(p => p.name === newPlayer.name);
-                if (!exists) {
-                    addPlayerToCollection(newPlayer);
-                }
-                video.removeEventListener('ended', addOnEnd);
-            };
-            video.addEventListener('ended', addOnEnd);
         }
 
-        document.getElementById("spinBtn")?.addEventListener("click", performSpin);
-        
-        document.getElementById("moreDetailsBtn")?.addEventListener("click", function() {
-            const names = packPlayersData.map(p => p.name).join(", ");
-            showToast(`Pack contains: ${names}`);
-        });
-        
-        document.getElementById("backHomeBtn")?.addEventListener("click", function() {
-            // Close video if open
-            document.getElementById("videoResultOverlay").classList.remove("active");
-            if (window.parent && window.parent.showHome) {
-                window.parent.showHome();
+        // Use DOMContentLoaded to ensure elements are ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const spinBtn = document.getElementById("spinBtn");
+            if (spinBtn) {
+                spinBtn.addEventListener("click", performSpin);
+                console.log("Spin button attached");
             } else {
-                window.location.href = "index.html";
+                console.log("Spin button not found");
             }
+            
+            document.getElementById("moreDetailsBtn")?.addEventListener("click", function() {
+                const names = packPlayersData.map(p => p.name).join(", ");
+                showToast(`Pack contains: ${names}`);
+            });
+            
+            document.getElementById("backHomeBtn")?.addEventListener("click", function() {
+                document.getElementById("videoResultOverlay").classList.remove("active");
+                if (window.parent && window.parent.showHome) {
+                    window.parent.showHome();
+                } else {
+                    window.location.href = "index.html";
+                }
+            });
         });
+
+        // Also attach directly as fallback
+        document.getElementById("spinBtn")?.addEventListener("click", performSpin);
 
         // Load remaining count from localStorage
         try {
